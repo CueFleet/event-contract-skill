@@ -1,29 +1,41 @@
 <p align="center">
-  <img src="assets/cover.webp" alt="CueFleet 币安事件合约策略 Skill" width="900">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/cuefleet-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/cuefleet-logo-light.svg">
+    <img src="assets/cuefleet-logo-light.svg" alt="CueFleet" width="152">
+  </picture>
 </p>
 
 <h1 align="center">币安事件合约策略 Skill</h1>
 
-<p align="center">用 Codex、Claude Code 等编码智能体编写策略，回测想法，再把信号接入 CueFleet 模拟跟单。</p>
+<p align="center">用 Codex、Claude Code 等编码智能体开发策略，回测历史表现，通过 CueFleet 本机 API 接入实盘。</p>
 
 <p align="center">
-  <a href="docs/quickstart.md"><strong>快速上手</strong></a> ·
+  <a href="docs/quickstart.md#实盘接入"><strong>实盘接入</strong></a> ·
+  <a href="docs/quickstart.md#模拟快速上手">示例工程</a> ·
   <a href="SKILL.md">Skill 指令</a> ·
-  <a href="references/signal-project.md">接口规范</a> ·
-  <a href="https://cuefleet.com/">CueFleet 官网</a>
+  <a href="references/signal-project.md">信号协议</a> ·
+  <a href="https://cuefleet.com/">官网</a>
 </p>
 
-## 这个仓库有什么
+## 从研究到实盘
 
-| 任务 | 提供的工具 |
-| --- | --- |
-| 准备历史行情 | 下载 BTCUSDT / ETHUSDT 的公开分钟 K 线，按时间划分训练和样本外区间 |
-| 验证策略 | 生成量化报告、交易明细，以及累计、日度、月度盈亏三联图 |
-| 接入信号 | 导出可启动的 Python 工程，或验证已有服务是否兼容 `cuefleet.signal.v1` |
+```mermaid
+flowchart LR
+    research["研究<br/>历史行情 · 策略回测"]
+    deploy["部署<br/>启动策略信号服务"]
+    live["实盘交易<br/>执行程序 → CueFleet 本机 API → 币安"]
+    research -->|验证策略| deploy
+    deploy -->|读取信号| live
+    classDef livePhase fill:#203a2f,stroke:#77b394,color:#f0fbf5
+    class live livePhase
+```
 
-## 先运行一个示例
+## 跑通接入
 
-在安装了 Git 和 Python 3.11+ 的电脑上打开终端。
+**实盘**在客户端页眉打开「API 设置」，选择已授权的币安账号，配置单笔上限并启动本机服务。策略执行程序在同一台机器上通过本机 API 提交已确认的交易方向。使用实盘前请先阅读 [实盘接入步骤](docs/quickstart.md#实盘接入)。
+
+**模拟**可直接用仓库提供的 BTC 示例。在安装了 Git 和 Python 3.11+ 的环境打开终端，运行下列命令。
 
 ```sh
 git clone https://github.com/CueFleet/event-contract-skill.git
@@ -31,14 +43,10 @@ cd event-contract-skill
 python scripts/signal_project.py --project examples --include market_momentum.py --strategy market_momentum:predict --symbol BTCUSDT --warmup 2 --name "BTC 双 K 线示例" --output my-btc-signal
 ```
 
-在 CueFleet Windows 0.5.87 或以上打开「AI 交易 → 信号服务 → 加载策略工程」，选择 `my-btc-signal` 文件夹。启动服务并预览信号，再到「本地跟单 → 我的模拟」创建跟单。[查看完整步骤，包括按地址接入](docs/quickstart.md)
+在 CueFleet Windows 0.5.87 或以上加载 `my-btc-signal`，启动服务后预览信号。可到「本地跟单 → 我的模拟」查看执行记录。[模拟快速上手](docs/quickstart.md#模拟快速上手)
 
-## 用自己的策略
+## 给编码智能体的任务示例
 
-将仓库目录交给你的编码智能体，告诉它标的、周期和策略思路。可以从下面这段提示词开始。
-
-> 阅读 `SKILL.md`。我想研究 BTCUSDT 10 分钟事件合约，单笔模拟 5 USDT，最多同时 5 笔。用已收盘的分钟 K 线实现策略，按时间划分训练与样本外区间，生成回测报告，并导出可在 CueFleet 加载的信号工程。用合成行情校验服务接口。
-
-已有策略服务可按 [信号协议](references/signal-project.md) 提供 `GET /health` 和 `POST /v1/predict`。回测使用的价格、支付率和执行假设会记在报告中。
+> 阅读 `SKILL.md`。开发 BTCUSDT 10 分钟事件合约策略，单笔按 5 USDT 回测，最多同时 5 笔。用已收盘行情划分训练和样本外区间，生成回测报告并导出信号工程。先用合成行情校验服务接口，同时整理实盘接入所需的信号和交易参数。
 
 [MIT 许可证](LICENSE)
