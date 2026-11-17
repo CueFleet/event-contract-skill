@@ -1,11 +1,13 @@
 ---
 name: cuefleet-vibe-trading
-description: Build and backtest CueFleet event-contract strategies, prepare historical or real-time market inputs, produce quantitative reports, export runnable Python signal projects, or validate external signal services for CueFleet using cuefleet.signal.v1.
+description: Develop and backtest Binance event-contract strategies for CueFleet, turn a trading hypothesis into testable rules, report out-of-sample performance, package or validate a signal service, and plan integration with the authorized local trading API.
 ---
 
-# CueFleet 策略实验室
+# CueFleet 事件合约策略
 
-策略实验以 `report.md` 为最终交付物。随报告保留 `performance.png`、`report.json`、分段交易明细及数据切分清单 `split-manifest.json`。数据目录由用户选择，大规模下载和报告输出放在源码及技能目录之外。
+根据用户的目标选择研究、回测、服务部署或实盘接入。先确认标的、事件到期周期、策略输入、交易金额与同时在途上限。用 [真实行情案例](docs/btc-volume-breakout.md) 查看同一份策略从历史回放到信号服务的完整实现。
+
+研究交付包括 `report.md`、`performance.png`、`report.json`、分段交易明细及数据切分清单 `split-manifest.json`。数据目录由用户选择，大规模下载和报告输出放在源码及技能目录之外。
 
 ## 历史数据、回测和报告
 
@@ -29,7 +31,7 @@ python "$SKILL/scripts/report.py" --split-dir runs/btc-splits --signals runs/btc
 
 ## 实时行情与特征
 
-为信号服务定义实时行情需求、预热窗口或训练与推理的特征口径时，阅读 [实时行情与策略特征](references/realtime-market-data.md)。优先复用 CueFleet 聚合的行情窗口。开发环境的行情入口与接口边界见该文档。
+为信号服务定义实时行情需求、预热窗口或训练与推理的特征口径时，阅读 [实时行情与策略特征](references/realtime-market-data.md)。在客户端预览或模拟时核对已收盘窗口和预热要求。自行部署的实盘执行程序负责准备行情窗口，并与离线研究使用一致的数据口径。
 
 ## 导出项目或接入已有信号服务
 
@@ -37,6 +39,12 @@ python "$SKILL/scripts/report.py" --split-dir runs/btc-splits --signals runs/btc
 
 向用户交付时给出可直接选择的工程根目录。根目录包含 `cuefleet_signal/signal.json`、启动脚本、依赖锁，以及推理所需的代码和权重。「信号服务 → 加载策略工程」先检查文件，再由用户启动服务。旧版入口为「我的信号」。参见 [快速上手和可运行示例](README.md)。
 
-用 `scripts/check_signal_service.py` 验证接口、行情声明和回传字段。在「信号服务」加载工程或添加地址，预览信号后到「本地跟单 → 我的模拟」创建并启动任务。CueFleet 提供已收盘行情，并管理账号、金额、交易模式和下单凭据。旧版「我的信号」使用 VIP 授权启动自动模拟。
+用 `scripts/check_signal_service.py` 验证健康检查、行情声明、预测方向和观测时间。加载工程或添加地址后，可在客户端预览信号，也可用模拟任务对照执行记录。
 
-维护已接入的旧版独立脚本时，阅读 [本地 Runtime v1](references/runtime.md)。
+## 实盘接入
+
+按 [实盘接入指南](docs/quickstart.md#实盘接入) 对接已授权的 CueFleet 本机交易 API。用户的执行程序读取策略信号和当前市场条件，在同一台机器上提交订单并管理回执。策略进程只接触行情和信号，交易密钥、账号、金额由执行程序保存和配置。
+
+先用「仅查询」验证账号和市场参数。生成执行程序时，保留行情新鲜度检查、无信号跳过、单笔和在途限制，以及每笔意图的 UUID。结果未知时核对原回执和交易所订单。切换「允许下单」或发送实盘订单需要操作人明确授权。
+
+维护已有的独立参考程序时，阅读 [本地 Runtime v1](references/runtime.md) 的兼容条件。
