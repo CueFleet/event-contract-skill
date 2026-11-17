@@ -21,6 +21,12 @@
 ## 从研究到实盘
 
 ```mermaid
+---
+config:
+  flowchart:
+    diagramPadding: 60
+    rankSpacing: 32
+---
 flowchart LR
     research["研究<br/>行情数据与回测"]
     deploy["部署<br/>策略信号服务"]
