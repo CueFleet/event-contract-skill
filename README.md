@@ -22,11 +22,11 @@
 
 ```mermaid
 flowchart LR
-    research["研究<br/>历史行情 · 策略回测"]
-    deploy["部署<br/>启动策略信号服务"]
-    live["实盘交易<br/>执行程序 → CueFleet 本机 API → 币安"]
+    research["研究<br/>行情数据与回测"]
+    deploy["部署<br/>策略信号服务"]
+    live["实盘交易<br/>本机 API → 币安"]
     research -->|验证策略| deploy
-    deploy -->|读取信号| live
+    deploy -->|执行程序读取信号| live
     classDef livePhase fill:#203a2f,stroke:#77b394,color:#f0fbf5
     class live livePhase
 ```
